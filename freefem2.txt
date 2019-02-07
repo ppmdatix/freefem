@@ -16,10 +16,12 @@ fespace Vh(Th,P2);
 
 // Constants
 
-int k = 4;
-//int k = 7;
-real beta1 = sqrt((4-pi)*(4+pi));
-complex beta2 = 1i*sqrt(4*(pi*pi-4));
+//int k = 4;
+int k = 7;
+//real beta1 = sqrt((4-pi)*(4+pi));
+real beta1 = sqrt((7-pi)*(7+pi));
+//complex beta2 = 1i*sqrt(4*(pi*pi-4));
+real beta2 = sqrt((7-2*pi)*(7+2*pi));
 complex alpha=(1+1i)/10;
 
 // Functions

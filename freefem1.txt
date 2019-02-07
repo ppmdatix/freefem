@@ -43,9 +43,13 @@ mesh Th = buildmesh (down(n)+right(n/2)+up(n)+left(n/2));
 
 plot(Th,wait=0,ps="mesh.eps");
 
-real beta1 = sqrt(16 - pi*pi);
-complex beta2 = 1i*sqrt(4*pi*pi - 16);
-real k = 4;
+//real beta1 = sqrt((4-pi)*(4+pi));
+real beta1 = sqrt((7-pi)*(7+pi));
+//complex beta2 = 1i*sqrt(4*(pi*pi-4));
+real beta2 = sqrt((7-2*pi)*(7+2*pi));
+//real k = 4;
+real k = 7;
+
 
 func g =  2*sin(pi*y) + sin(2*pi*y);
 func uex = 2*exp(1i*beta1*x)*sin(pi*y) + exp(1i*beta2*x)*sin(2*pi*y);
