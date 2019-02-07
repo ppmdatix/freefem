@@ -1,0 +1,76 @@
+// Definition du bord du domaine
+// -----------------------------
+//
+//                         label 3
+//        (0,1)   ----------------------------- (3,1)
+//                |                            |
+//                |                            |
+//       label 4  |                            |  label 2
+//                |                            |
+//                |                            |
+//       (0,0)    ------------------------------ (3,0)
+//                         label 1
+//
+
+
+//border bottom(t=0,1){x=3.0*t; y=0.0; label=1;};
+//border top(t=1,0){x=3.0*t; y=1.0; label=3;};
+//border left(t=1,0){x=0.0; y=1.0*t; label=4;};
+//border right(t=0,1){x=3.0; y=1.0*t; label=2;};
+
+//func perio=[[4,y],[2,y]];
+
+//int m=3;
+//int n=1;
+
+//plot(bottom(m)+top(m)+left(n)+right(n));
+
+//mesh Th=buildmesh(bottom(m)+top(m)+left(n)+right(n));//, fixeborder=true);
+
+//Th=adaptmesh(Th, 0.025*2, IsMetric=1, nbvx=100000, periodic=perio);
+
+//Th=adaptmesh(Th, 0.025*2, IsMetric=1, nbvx=100000, periodic=perio);
+
+real L=3;
+border up(t=0,L){x=L-t;y=1;label=1;};
+border down(t=0,L){x=t;y=0;label=2;};
+border left(t=0,1){x=0;y=1-t;label=3;};
+border right(t=0,1){x=L;y=t;label=4;};
+int n=100;
+
+// Approximation space
+mesh Th = buildmesh (down(n)+right(n/2)+up(n)+left(n/2));
+
+plot(Th,wait=0,ps="mesh.eps");
+
+real beta1 = sqrt(16 - pi*pi);
+complex beta2 = 1i*sqrt(4*pi*pi - 16);
+real k = 4;
+
+func g =  2*sin(pi*y) + sin(2*pi*y);
+func uex = 2*exp(1i*beta1*x)*sin(pi*y) + exp(1i*beta2*x)*sin(2*pi*y);
+
+fespace Vh(Th,P1); 
+
+Vh<complex> uh,vh,uexh=uex;
+
+solve Problem(uh,vh) =
+    int2d(Th)(  dx(uh)*dx(vh) + dy(uh)*dy(vh) - k*k*uh*vh) + on(left,uh=g) + on(up, uh = 0) + on(down, uh = 0);
+
+    //int1d(Th,right)( 1i*beta1*uh*vh ) 
+
+Vh ruh = real(uh);
+Vh tuh = real(uexh);
+plot(tuh,fill=1,value=true);
+
+real L2 = int2d(Th)(abs(uh-uexh)^2);
+cout << "L2-error : " << sqrt(L2) << endl;
+
+
+
+
+
+
+
+
+

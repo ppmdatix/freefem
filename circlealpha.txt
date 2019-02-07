@@ -1,0 +1,72 @@
+// Geometry
+real L=3;
+real w=1;
+real xcenter = 0.8;
+real ycenter = 0.5;
+real rayon = 0.2;
+border up(t=0,L+w){x=L+w-t;y=1;label=1;};
+border down(t=0,L+w){x=t;y=0;label=2;};
+border left(t=0,1){x=0;y=1-t;label=3;};
+border right(t=0,1){x=L+w;y=t;label=4;};
+border circle(t=0,2*pi){x= xcenter + rayon*cos(-t);y=ycenter + rayon*sin(-t);};
+int n=100;
+
+
+// Approximation space
+mesh Th = buildmesh (down(n)+right(n/2)+up(n)+left(n/2)+ circle(n));
+fespace Vh(Th,P2); 
+
+// Constants
+
+int k = 4;
+//int k = 7;
+real beta1 = sqrt((4-pi)*(4+pi));
+complex beta2 = 1i*sqrt(4*(pi*pi-4));
+complex alpha=(1+1i)/10;
+
+// Functions
+// ... boundary datum
+func g = 2*sin(pi*y)+sin(2*pi*y);
+func a = 1*(x<=L)+alpha*(x>L)*(x<L+w);
+
+// ... exact solution
+func uex = 2*exp(1i*beta1*x)*sin(pi*y) + exp(1i*beta2*x)*sin(2*pi*y);
+
+Vh<complex> uhV,vh,uexh=uex,ah=a;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Resolution 
+
+solve ProblemV(uhV,vh) =
+    int2d(Th)( a*dx(uhV)*dx(vh) +(1/a)*dy(uhV)*dy(vh) - (1/a)*k*k*uhV*vh ) + 
+    on(up,uhV=0) + 
+    on(down,uhV=0) + 
+    on(left,uhV=g)+
+    on(right,uhV=0);
+    
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Post-processing
+
+// H1 Error of the difference
+
+real L2,H1;
+//complex L2,H1;
+
+
+//L2 = int2d(Th)((uhV-uexh)^2);
+//H1 = int2d(Th)((dx(uhV)-dx(uexh))^2+(dy(uhV)-dy(uexh))^2);
+
+func indic = 1*(x<=L)+0*(x>L)*(x<L+w);
+L2 = int2d(Th)(indic * abs(uhV-uexh)^2);
+H1 = int2d(Th)(indic * (abs(dx(uhV)-dx(uexh))^2+abs(dy(uhV)-dy(uexh))^2));
+
+cout << "Low frequency H1-error : " << sqrt(L2+H1) << endl;
+
+// Graphical output
+Vh uhVR=real(uhV),uexhR=real(uexh);
+plot(uhVR,fill=1,value=true,wait=true);
+plot(uexhR,fill=1,value=true,wait=true);
+
